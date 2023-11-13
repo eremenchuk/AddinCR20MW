@@ -101,117 +101,145 @@ int Reader::GetLastError()
 std::vector<char> Reader::Read(AddInNative *comp, int sector, int block, int count, bool skip)
 {
   auto out = new std::vector<char>();
-	int blocksCount = count;
-	int currentSector = sector;
-	int currentBlock = block;
-	while (blocksCount > 0)
-	{
-		int sectorSize = 4;
-		int offset = currentSector * sectorSize + currentBlock;
-		int blocksToRead = (skip ? sectorSize - 1 : sectorSize) - currentBlock;
-		if (currentSector >= 32)
-		{
-			sectorSize = 16;
-			offset = 32 * 4 + (currentSector - 32) * sectorSize + currentBlock;
-			//blocksToRead = sectorSize - 2 - currentBlock;
-			blocksToRead = (skip ? sectorSize - 1 : sectorSize) - currentBlock;
-		}
-		if (blocksToRead > blocksCount)
-		{
-			blocksToRead = blocksCount;
-		}
-		if (blocksToRead > 14) {
-			//currentSector += 1;
-			currentBlock = 14;
-			blocksToRead = 14;
-		}
-		else {
-			currentSector += 1;
-			currentBlock = 0;
-		}
+  int blocksCount = count;
+  int currentSector = sector;
+  int currentBlock = block;
+  while (blocksCount > 0)
+  {
+    int sectorSize = 4;
+    int offset = currentSector * sectorSize + currentBlock;
+    int blocksToRead = (skip ? sectorSize - 1 : sectorSize) - currentBlock;
+    if (currentSector >= 32)
+    {
+      sectorSize = 16;
+      offset = 32 * 4 + (currentSector - 32) * sectorSize + currentBlock;
+      // blocksToRead = sectorSize - 2 - currentBlock;
+      blocksToRead = (skip ? sectorSize - 1 : sectorSize) - currentBlock;
+    }
+    if (blocksToRead > blocksCount)
+    {
+      blocksToRead = blocksCount;
+    }
+    if (blocksToRead > 14)
+    {
+      // currentSector += 1;
+      currentBlock = 14;
+      blocksToRead = 14;
+    }
+    else
+    {
+      currentSector += 1;
+      currentBlock = 0;
+    }
     auto bufferLength = blocksToRead * 16;
     BYTE *buffer = new BYTE[bufferLength];
     lastError = API_PCDRead(0, 0, 0, offset, blocksToRead, key, buffer);
-    if (lastError != 0) {
-			return *out;
-		}
+    if (lastError != 0)
+    {
+      return *out;
+    }
     auto row = new std::vector<char>((char *)buffer, (char *)buffer + bufferLength);
     out->insert(out->end(), row->begin(), row->end());
-    //std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-    //std::string des;
-    //des += std::to_string(offset);
-    //des += " ";
-    //des += std::to_string(blocksToRead);
-    //comp->AddError(convert.from_bytes(des));
+    // std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+    // std::string des;
+    // des += std::to_string(offset);
+    // des += " ";
+    // des += std::to_string(blocksToRead);
+    // comp->AddError(convert.from_bytes(des));
 
     blocksCount -= blocksToRead;
-    //currentSector += 1;
-    //currentBlock = 0;
+    // currentSector += 1;
+    // currentBlock = 0;
   }
   return *out;
 }
 
 void Reader::Write(AddInNative *comp, int sector, int block, int count, bool skip, std::vector<char> *data)
 {
-	int blocksCount = count;
-	//int currentSector = sector;
-	int offset = sector * 4 + block;
-	if (sector >= 32) {
-		int offset = sector * 16 + block;
-	}
-	//int currentBlock = block;
-	int dataOffset = 0;
-	int blocksToWrite = 1;
+  int blocksCount = count;
+  // int currentSector = sector;
+  int offset = sector * 4 + block;
+  if (sector >= 32)
+  {
+    int offset = sector * 16 + block;
+  }
+  // int currentBlock = block;
+  int dataOffset = 0;
+  int blocksToWrite = 1;
   while (blocksCount > 0)
   {
-		//int sectorSize = 4;
-		//int offset = currentSector * sectorSize + currentBlock;
-		//int blocksToWrite = (skip ? sectorSize - 1 : sectorSize) - currentBlock;
-		//if (currentSector >= 32)
-		//{
-			//sectorSize = 16;
-			//offset = 32 * 4 + (currentSector - 32) * sectorSize + currentBlock;
-			//blocksToWrite = sectorSize - 2 - currentBlock;
-			//blocksToWrite = (skip ? sectorSize - 1 : sectorSize) - currentBlock;
-		//}
-		//if (blocksToWrite > blocksCount)
-		//{
-		//	blocksToWrite = blocksCount;
-		//}
-		//if (blocksToWrite > 14) {
-		//	//currentSector += 1;
-		//	currentBlock = 14;
-		//	blocksToWrite = 14;
-		//}
-		//else {
-		//	currentSector += 1;
-		//	currentBlock = 0;
-		//}
-		if (skip) {
-			if (((offset < 128) && (offset % 4 == 3)) || ((offset >= 128) && (offset % 16 == 15))) {
-				offset++;
-				continue;
-			}
-		}
+    // int sectorSize = 4;
+    // int offset = currentSector * sectorSize + currentBlock;
+    // int blocksToWrite = (skip ? sectorSize - 1 : sectorSize) - currentBlock;
+    // if (currentSector >= 32)
+    //{
+    // sectorSize = 16;
+    // offset = 32 * 4 + (currentSector - 32) * sectorSize + currentBlock;
+    // blocksToWrite = sectorSize - 2 - currentBlock;
+    // blocksToWrite = (skip ? sectorSize - 1 : sectorSize) - currentBlock;
+    //}
+    // if (blocksToWrite > blocksCount)
+    //{
+    //	blocksToWrite = blocksCount;
+    //}
+    // if (blocksToWrite > 14) {
+    //	//currentSector += 1;
+    //	currentBlock = 14;
+    //	blocksToWrite = 14;
+    //}
+    // else {
+    //	currentSector += 1;
+    //	currentBlock = 0;
+    //}
+    if (skip)
+    {
+      if (((offset < 128) && (offset % 4 == 3)) || ((offset >= 128) && (offset % 16 == 15)))
+      {
+        offset++;
+        continue;
+      }
+    }
     auto bufferLength = blocksToWrite * 16;
     auto row = new std::vector<char>(data->begin() + dataOffset * 16, data->begin() + dataOffset * 16 + bufferLength);
     auto key = new BYTE[6];
     memset(key, 0xff, 6);
     BYTE *buf = (BYTE *)&row->front();
     lastError = API_PCDWrite(0, 0, 0, offset, blocksToWrite, key, buf);
-    if (lastError != 0) {
-			return;
-		}
-    //std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-    //std::string des;
-    //des += std::to_string(offset);
-    //des += " ";
-    //des += std::to_string(blocksToWrite);
-    //comp->AddError(convert.from_bytes(des));
-		dataOffset += blocksToWrite;
-		blocksCount -= blocksToWrite;
-		//currentSector += 1;
-		//currentBlock = 0;
-		offset++;
+    if (lastError != 0)
+    {
+      return;
+    }
+    // std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+    // std::string des;
+    // des += std::to_string(offset);
+    // des += " ";
+    // des += std::to_string(blocksToWrite);
+    // comp->AddError(convert.from_bytes(des));
+    dataOffset += blocksToWrite;
+    blocksCount -= blocksToWrite;
+    // currentSector += 1;
+    // currentBlock = 0;
+    offset++;
   }
+}
+
+std::string Reader::GetCardSnr()
+{
+  BYTE *buf = new BYTE[128];
+  BYTE snr[16];
+  lastError = GET_SNR(0, 0, 0x26, 0x00, snr, buf);
+  std::string cardSnr = std::format("%02x%02x%02x%02x", buf[0], buf[1], buf[2], buf[3]);
+  delete buf;
+  return cardSnr;
+}
+
+std::string Reader::GetReaderSnr()
+{
+  BYTE *buf = new BYTE[128];
+  lastError = GetReaderVersion(buf);
+  std::string readerSnr = std::format("%02x %02x %02x %02x %02x %02x %02x %02x",
+                                      buf[1], buf[2], buf[3],
+                                      buf[4], buf[5], buf[6], buf[7], buf[8]);
+  delete buf;
+  return readerSnr;
 }

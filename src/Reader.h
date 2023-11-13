@@ -1,7 +1,8 @@
 #include "mireader.h"
 #include <vector>
-//#include <codecvt>
+// #include <codecvt>
 #include "AddInNative.h"
+#include <format>
 
 typedef unsigned char BYTE;
 
@@ -19,4 +20,6 @@ public:
   int GetLastError();
   std::vector<char> Read(AddInNative *, int, int, int, bool);
   void Write(AddInNative *, int, int, int, bool, std::vector<char> *);
+  std::string GetCardSnr();
+  std::string GetReaderSnr();
 };

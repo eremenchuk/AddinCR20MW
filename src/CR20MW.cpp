@@ -30,6 +30,12 @@ CR20MW::CR20MW()
 	AddFunction(
 			u"GetLastError", u"ПолучитьОшибку", [&]()
 			{ result = (int64_t)this->reader->GetLastError(); });
+	AddFunction(
+			u"GetCardSnr", u"ПолучитьСерийныйНомерКарты", [&]()
+			{ result = this->reader->GetCardSnr(); });
+	AddFunction(
+			u"GetReaderSnr", u"ПолучитьСерийныйНомерУстройства", [&]()
+			{ result = this->reader->GetReaderSnr(); });
 	AddFunction(u"ReadMifareC", u"ЧитатьMifareC", [&](VH handlev, VH sectorv, VH blockv, VH datav, VH block_countv, VH reader_keysv, VH keybv, VH skipv, VH timeoutv, VH key_posv)
 							{ result = reader->Read(this, sectorv, blockv, block_countv, skipv); });
 	AddProcedure(u"WriteMifareC", u"ПисатьMifareC", [&](VH handlev, VH sectorv, VH blockv, VH datav, VH block_countv, VH reader_keysv, VH keybv, VH skipv, VH timeoutv, VH key_posv)
