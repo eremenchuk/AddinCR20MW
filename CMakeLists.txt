@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(CR20MW)
 set(TARGET CR20MW)
 
+set(CXX_STANDARD 17)
+
 add_library(${TARGET} SHARED
 	src/AddInNative.cpp
 	src/AddInNative.def
@@ -45,7 +47,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 	OUTPUT_NAME ${PROJECT_NAME}${MySuffix2}
 	POSITION_INDEPENDENT_CODE ON
 	CXX_STANDARD_REQUIRED ON
-	CXX_STANDARD 20
+	CXX_STANDARD 17
 )
 
 if(UNIX)

@@ -1,5 +1,19 @@
 #include "Reader.h"
 
+template <typename... Args>
+std::string format(const std::string &format, Args... args)
+{
+  int size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'
+  if (size_s <= 0)
+  {
+    throw std::runtime_error("Error during formatting.");
+  }
+  auto size = static_cast<size_t>(size_s);
+  std::unique_ptr<char[]> buf(new char[size]);
+  std::snprintf(buf.get(), size, format.c_str(), args...);
+  return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+}
+
 Reader::Reader()
 {
   key = new BYTE[6];
@@ -228,7 +242,7 @@ std::string Reader::GetCardSnr()
   BYTE *buf = new BYTE[128];
   BYTE snr[16];
   lastError = GET_SNR(0, 0, 0x26, 0x00, snr, buf);
-  std::string cardSnr = std::format("%02x%02x%02x%02x", buf[0], buf[1], buf[2], buf[3]);
+  std::string cardSnr = format("%02x%02x%02x%02x", buf[0], buf[1], buf[2], buf[3]);
   delete buf;
   return cardSnr;
 }
@@ -237,7 +251,7 @@ std::string Reader::GetReaderSnr()
 {
   BYTE *buf = new BYTE[128];
   lastError = GetReaderVersion(buf);
-  std::string readerSnr = std::format("%02x %02x %02x %02x %02x %02x %02x %02x",
+  std::string readerSnr = format("%02x %02x %02x %02x %02x %02x %02x %02x",
                                       buf[1], buf[2], buf[3],
                                       buf[4], buf[5], buf[6], buf[7], buf[8]);
   delete buf;

@@ -2,7 +2,9 @@
 #include <vector>
 // #include <codecvt>
 #include "AddInNative.h"
-#include <format>
+#include <memory>
+#include <string>
+#include <stdexcept>
 
 typedef unsigned char BYTE;
 
