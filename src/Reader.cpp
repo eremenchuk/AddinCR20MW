@@ -1,7 +1,7 @@
 #include "Reader.h"
 
 template <typename... Args>
-std::string format(const std::string &format, Args... args)
+std::string format_string(const std::string &format, Args... args)
 {
   int size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'
   if (size_s <= 0)
@@ -242,7 +242,7 @@ std::string Reader::GetCardSnr()
   BYTE *buf = new BYTE[128];
   BYTE snr[16];
   lastError = GET_SNR(0, 0, 0x26, 0x00, snr, buf);
-  std::string cardSnr = format("%02x%02x%02x%02x", buf[0], buf[1], buf[2], buf[3]);
+  std::string cardSnr = format_string("%02x%02x%02x%02x", buf[0], buf[1], buf[2], buf[3]);
   delete buf;
   return cardSnr;
 }
@@ -251,9 +251,9 @@ std::string Reader::GetReaderSnr()
 {
   BYTE *buf = new BYTE[128];
   lastError = GetReaderVersion(buf);
-  std::string readerSnr = format("%02x %02x %02x %02x %02x %02x %02x %02x",
-                                      buf[1], buf[2], buf[3],
-                                      buf[4], buf[5], buf[6], buf[7], buf[8]);
+  std::string readerSnr = format_string("%02x %02x %02x %02x %02x %02x %02x %02x",
+                                        buf[1], buf[2], buf[3],
+                                        buf[4], buf[5], buf[6], buf[7], buf[8]);
   delete buf;
   return readerSnr;
 }
